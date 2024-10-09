@@ -1,0 +1,117 @@
+{% extends 'base.html'%}
+{% block content%}
+{% load static %}
+{% load humanize %}
+        <!-- Header-->
+        <header class="bg-dark py-5">
+            <div class="container px-4 px-lg-5 my-5">
+                <div class="text-center text-white">
+                    <h1 class="display-4 fw-bolder">buying</h1>
+                    <p class="lead fw-normal text-white-50 mb-0">add your buy</p>
+                </div>
+            </div>
+        </header>
+      {% if cart_products %}
+        {% for product in cart_products %}
+        <div class="container">
+            <div class="card mb-3">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                         <img src="{{ product.picture.url}}" class="img-fluid rounded-start"  alt="..." />
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">{{product.name}}</h5>
+                            <p class="card-text">{{product.description}}</p>
+                            {% if product.is_sale %}
+                            <p class="card-text"> <strike>{{product.price|intcomma}} toman </strike> <br><br>{{ product.sale_price | intcomma }} toman </p>
+                            {%else%}
+                            <p class="card-text">{{product.price|intcomma}} toman</p>
+                            {%endif%}
+                            <br><br>
+                            <p class="cart-text"> quantity </p>
+                            <select class="form-select" id="select{{product.id}}">
+                                {% for key,value in quantities.items %}
+                                    {% if key == product.id|slugify %}
+                                        <option selected > {{ value }} </option>
+                                    {% endif %}
+                                {% endfor %}
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                            <button type="button" data-index={{ product.id }}
+                            class='btn btn-danger update-cart'> update </button>
+                            <br><br>
+                            <button type="button" data-index={{ product.id }}
+                            class='btn btn-danger delete-product'> delete </button>
+                            <br><br>
+                            <a href="{% url 'home'%}" class="btn btn-secondary "> back to home </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        {% endfor %}
+          <h3> total price: {{ total |intcomma }} toman </h3>
+      {% else %}
+        <center> <h3 class="container"> is empty </h3> </center>
+      {% endif %}
+    <br><br><br>
+    <script>
+$(document).on ('click', ".update-cart", function(e){
+  e.preventDefault();
+  var productid=$(this).data('index')
+  $.ajax ({
+    type:'POST',
+    url:'{% url "cart_update" %}',
+    data:{
+      product_id: $(this).data('index'),
+      product_qty: $('#select'+productid+'option:selected').text(),
+      csrfmiddlewaretoken:'{{csrf_token}}',
+      action:'post'
+    },
+    success: function(json){
+      //console.log(json)
+     // document.getElementById('cart_quantity').textContent=json.qty
+        location.reload()
+    },
+    error: function(xhr,errmsg,err){
+
+    }
+  })
+
+
+})
+
+
+$(document).on ('click', ".delete-product", function(e){
+  e.preventDefault();
+
+  $.ajax ({
+    type:'POST',
+    url:'{% url "cart_delete" %}',
+    data:{
+      product_id: $(this).data('index'),
+
+      csrfmiddlewaretoken:'{{csrf_token}}',
+      action:'post'
+    },
+    success: function(json){
+      //console.log(json)
+     // document.getElementById('cart_quantity').textContent=json.qty
+        location.reload()
+    },
+    error: function(xhr,errmsg,err){
+
+    }
+  })
+
+
+})
+
+</script>
+{% endblock%}
+                    

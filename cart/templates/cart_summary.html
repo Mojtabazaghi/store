@@ -1,0 +1,22 @@
+{% extends 'base.html'%}
+{% block content%}
+{% load static %}
+{% load humanize %}
+        <!-- Header-->
+        <header class="bg-dark py-5">
+            <div class="container px-4 px-lg-5 my-5">
+                <div class="text-center text-white">
+                    <h1 class="display-4 fw-bolder">buying</h1>
+                    <p class="lead fw-normal text-white-50 mb-0">add your buy</p>
+                </div>
+            </div>
+        </header>
+        <p class="container">
+            {% for product in cart_products %}
+            {{product.name}} | {{product.price}}
+            {% endfor %}
+
+        </p>
+      
+{% endblock%}
+                    
